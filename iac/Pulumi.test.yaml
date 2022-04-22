@@ -1,0 +1,4 @@
+encryptionsalt: v1:LWWQ4Oz9Z9M=:v1:Y5pSbNhJTZLB4GyK:VsHy3pHlK9QQCTv8kPGOy3OX2zZbeA==
+config:
+  udacity-sre:PULUMI_CONFIG_PASSPHRASE:
+    secure: v1:bDoXTFmcuXYVkhia:8HH5G1t7ZeobYIyKI3oIv691FmnshPuo4XKuZQ==

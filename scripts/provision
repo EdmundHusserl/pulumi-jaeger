@@ -1,0 +1,12 @@
+set -eu
+
+replace_static_ip_in_kube_config() {
+  vagrant ssh -c "hostname -I | cut -d ' ' -f1" | tr -d '\n' > ip.tmp
+  K3S_IP=$(cat ip.tmp)
+  sed -i "s/127.0.0.1/${K3S_IP}/" iac/k3s.yaml
+}
+
+# Spin up a new box and get k3s config file
+vagrant up \
+  && vagrant ssh -c "cat /etc/rancher/k3s/k3s.yaml" > iac/k3s.yaml \
+  && replace_static_ip_in_kube_config
