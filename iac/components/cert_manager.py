@@ -3,19 +3,21 @@ from pulumi_kubernetes.helm.v3 import (
     Release as HelmRelease,
     RepositoryOptsArgs
 )
-from pulumi_kubernetes import Provider
 
 
 class CertManager(pulumi.ComponentResource):
 
-    def __init__(self, namespace: str, k8s_provider: Provider):
+    def __init__(self,
+                 namespace: str,
+                 opts: RepositoryOptsArgs = None):
         super().__init__("kubernetes:helm-release", "cert-manager")
-        self.create_resources(namespace, k8s_provider)
+        self.create_resources(namespace, opts)
 
     def create_resources(self,
                          namespace: str,
-                         k8s_provider: Provider) -> HelmRelease:
+                         opts: pulumi.ResourceOptions = None) -> HelmRelease:
 
+        opts.parent = self
         return HelmRelease(
             name="cert-manager",
             resource_name="cert-manager",
@@ -26,8 +28,5 @@ class CertManager(pulumi.ComponentResource):
                 repo="https://charts.jetstack.io"
             ),
             version="v1.7.1",
-            opts=pulumi.ResourceOptions(
-                parent=self,
-                provider=k8s_provider
-            )
+            opts=opts
         )
