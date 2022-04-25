@@ -7,10 +7,13 @@ from pulumi_kubernetes.core.v1 import (
     NamespaceInitArgs
 )
 from pulumi_kubernetes import Provider as K8sProvider
+from os import environ
 
 # Config
 KUBE_CONFIG = "k3s.yaml"
 CLUSTER_NAME = CONTEXT_NAME = "default"
+OBSERVABILITY = "observability"
+environ["KUBE_CONFIG"] = KUBE_CONFIG
 
 
 with open(KUBE_CONFIG, "r") as kubeconfig:
@@ -23,8 +26,8 @@ with open(KUBE_CONFIG, "r") as kubeconfig:
     kubeconfig.close()
 
 
-observability = Namespace(
-    "observability",
+observability_namespace = Namespace(
+    OBSERVABILITY,
     args=NamespaceInitArgs(metadata={"name": "observability"}),
     opts=pulumi.ResourceOptions(
         provider=k8s_provider
@@ -32,23 +35,23 @@ observability = Namespace(
 )
 
 cert_manager = CertManager(
-    "observability",
+    OBSERVABILITY,
     opts=pulumi.ResourceOptions(
         provider=k8s_provider,
-        depends_on=[observability]
+        depends_on=[observability_namespace]
     )
 )
-jaeger = JaegerOperator(
-    "observability",
+JaegerOperator(
+    OBSERVABILITY,
     opts=pulumi.ResourceOptions(
         provider=k8s_provider,
-        depends_on=[observability, cert_manager]
+        depends_on=[observability_namespace, cert_manager]
     )
 )
-grafana = Grafana(
-    "observability",
+Grafana(
+    OBSERVABILITY,
     opts=pulumi.ResourceOptions(
         provider=k8s_provider,
-        depends_on=[observability]
+        depends_on=[observability_namespace]
     )
 )
