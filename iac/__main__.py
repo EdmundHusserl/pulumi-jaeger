@@ -40,4 +40,4 @@ jaeger = JaegerOperator(
         ]
     )
 )
-grafana = Grafana()
+grafana = Grafana("observabiity", k8s_provider)
