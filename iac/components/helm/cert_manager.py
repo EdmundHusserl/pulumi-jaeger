@@ -23,6 +23,9 @@ class CertManager(pulumi.ComponentResource):
             resource_name="cert-manager",
             chart="cert-manager",
             namespace=namespace,
+            values={
+                "installCRDs": True
+            },
             timeout=300,
             repository_opts=RepositoryOptsArgs(
                 repo="https://charts.jetstack.io"

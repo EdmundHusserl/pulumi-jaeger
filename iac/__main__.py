@@ -1,11 +1,6 @@
-import pulumi
-from components.jaeger import JaegerOperator
-from components.cert_manager import CertManager
-from components.grafana import Grafana
-from pulumi_kubernetes.core.v1 import (
-    Namespace,
-    NamespaceInitArgs
-)
+from components.jaeger import Jaeger
+from components.backend import BackendApp
+from components.frontend import FrontEndApp
 from pulumi_kubernetes import Provider as K8sProvider
 from os import environ
 
@@ -25,33 +20,17 @@ with open(KUBE_CONFIG, "r") as kubeconfig:
     )
     kubeconfig.close()
 
+    Jaeger(
+        name="jaeger",
+        file_name="components/values/jaeger.yaml"
+    )
 
-observability_namespace = Namespace(
-    OBSERVABILITY,
-    args=NamespaceInitArgs(metadata={"name": "observability"}),
-    opts=pulumi.ResourceOptions(
-        provider=k8s_provider
+    FrontEndApp(
+        name="frontend-app",
+        file_name="components/values/frontend.yaml"
     )
-)
 
-cert_manager = CertManager(
-    OBSERVABILITY,
-    opts=pulumi.ResourceOptions(
-        provider=k8s_provider,
-        depends_on=[observability_namespace]
+    BackendApp(
+        name="backend-app",
+        file_name="components/values/backend.yaml"
     )
-)
-JaegerOperator(
-    OBSERVABILITY,
-    opts=pulumi.ResourceOptions(
-        provider=k8s_provider,
-        depends_on=[observability_namespace, cert_manager]
-    )
-)
-Grafana(
-    OBSERVABILITY,
-    opts=pulumi.ResourceOptions(
-        provider=k8s_provider,
-        depends_on=[observability_namespace]
-    )
-)

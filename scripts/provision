@@ -1,3 +1,4 @@
+#!/bin/bash
 set -eu
 
 replace_static_ip_in_kube_config() {
